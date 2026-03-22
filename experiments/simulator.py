@@ -1,5 +1,5 @@
 import random
-from runner import run_all_algorithms
+from experiments.runner import run_all_algorithms
 
 
 def get_free_positions(maze):
