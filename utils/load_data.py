@@ -5,7 +5,12 @@ def load_maze(file_path):
 
     with open(file_path, 'r') as file:
         for i, line in enumerate(file):
-            row = list(line.strip())
+            line = line.strip()
+
+            if not line:
+                continue
+
+            row = list(line)
             maze.append(row)
 
             for j, value in enumerate(row):
@@ -14,4 +19,12 @@ def load_maze(file_path):
                 elif value == '3':
                     goal_positions.append((i, j))
 
-    return maze, start_positions, goal_positions
+    if len(start_positions) == 0:
+        raise ValueError("El laberinto no tiene punto de inicio (2)")
+
+    if len(goal_positions) == 0:
+        raise ValueError("El laberinto no tiene meta (3)")
+
+    start = start_positions[0]
+
+    return maze, start, goal_positions

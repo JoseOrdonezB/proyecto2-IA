@@ -28,7 +28,8 @@ def a_star_search(maze, initial_state, goal_states, heuristic_fn):
 
     while not frontier.EMPTY():
         current_node = frontier.POP()
-        frontier_states.remove(current_node.state)
+        if current_node.state in frontier_states:
+            frontier_states.remove(current_node.state)
 
         nodes_explored += 1
 
