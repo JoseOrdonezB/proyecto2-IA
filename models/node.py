@@ -29,5 +29,16 @@ class Node:
 
         return list(reversed(actions))
 
+    # 🔴 NECESARIO para PriorityQueue (A*, Greedy)
+    def __lt__(self, other):
+        return self.f() < other.f()
+
+    # 🔴 Para usar en sets y evitar revisitar estados
+    def __eq__(self, other):
+        return isinstance(other, Node) and self.state == other.state
+
+    def __hash__(self):
+        return hash(self.state)
+
     def __repr__(self):
-        return f"Node({self.state}, g={self.cost}, h={self.heuristic})"
+        return f"Node({self.state}, g={self.cost}, h={self.heuristic}, f={self.f()})"
