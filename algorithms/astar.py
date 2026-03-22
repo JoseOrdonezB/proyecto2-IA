@@ -1,43 +1,96 @@
+import time
 from models.node import Node
 from structures.priority import PRIORITY
 
 
-def a_star_search(graph, heuristics, initial_state, goal_state):
+def a_star_search(maze, initial_state, goal_states, heuristic_fn):
+    start_time = time.time()
 
     root = Node(
         state=initial_state,
         cost=0,
-        heuristic=heuristics[initial_state]
+        heuristic=heuristic_fn(initial_state, goal_states)
     )
 
     frontier = PRIORITY()
-    frontier.ADD(root, root.cost + root.heuristic)
+    frontier.ADD(root, root.f())
 
     explored = set()
+    frontier_states = {initial_state}
+
+    best_cost = {initial_state: 0}
+
+    nodes_explored = 0
+    total_children = 0
+
+    rows = len(maze)
+    cols = len(maze[0])
 
     while not frontier.EMPTY():
         current_node = frontier.POP()
+        frontier_states.remove(current_node.state)
 
-        if current_node.state == goal_state:
-            return current_node
+        nodes_explored += 1
+
+        if current_node.state in goal_states:
+            end_time = time.time()
+
+            path = current_node.path()
+
+            branching_factor = (
+                total_children / nodes_explored if nodes_explored > 0 else 0
+            )
+
+            return {
+                "path": path,
+                "cost": len(path) - 1,
+                "nodes_explored": nodes_explored,
+                "time": end_time - start_time,
+                "branching_factor": branching_factor
+            }
 
         explored.add(current_node.state)
 
-        if current_node.state in graph:
-            for neighbor in graph[current_node.state]:
+        i, j = current_node.state
 
-                new_cost = current_node.cost + graph[current_node.state][neighbor]
+        neighbors = [
+            (i - 1, j),
+            (i, j + 1),
+            (i + 1, j),
+            (i, j - 1)
+        ]
 
-                if neighbor not in explored:
-                    child = Node(
-                        state=neighbor,
-                        parent=current_node,
-                        action=f"{current_node.state} -> {neighbor}",
-                        cost=new_cost,
-                        heuristic=heuristics[neighbor]
-                    )
+        for ni, nj in neighbors:
+            if 0 <= ni < rows and 0 <= nj < cols:
+                if maze[ni][nj] != '1':
+                    neighbor = (ni, nj)
 
-                    f_value = child.cost + child.heuristic
-                    frontier.ADD(child, f_value)
+                    new_cost = current_node.cost + 1
 
-    return None
+                    if neighbor not in best_cost or new_cost < best_cost[neighbor]:
+                        best_cost[neighbor] = new_cost
+
+                        child = Node(
+                            state=neighbor,
+                            parent=current_node,
+                            action=(ni, nj),
+                            cost=new_cost,
+                            heuristic=heuristic_fn(neighbor, goal_states)
+                        )
+
+                        frontier.ADD(child, child.f())
+                        frontier_states.add(neighbor)
+
+                        total_children += 1
+
+    end_time = time.time()
+
+    return {
+        "path": None,
+        "cost": None,
+        "nodes_explored": nodes_explored,
+        "time": end_time - start_time,
+        "branching_factor": (
+            total_children / nodes_explored if nodes_explored > 0 else 0
+        )
+    }
