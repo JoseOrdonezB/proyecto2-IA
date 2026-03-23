@@ -1,5 +1,5 @@
 import random
-from experiments.runner import run_all_algorithms
+from experiments.runner import run_all_algorithms, run_algorithm
 
 
 def get_free_positions(maze):
@@ -22,15 +22,21 @@ def generate_random_starts(maze, n=10):
     return random.sample(free_positions, n)
 
 
-def run_simulation(maze, goals, n_starts=10):
+def run_simulation(maze, goals, n_starts=10, algorithm_name=None):
+    """
+    Ejecuta simulaciones desde n_starts aleatorios.
+    Si se proporciona algorithm_name, ejecuta solo ese algoritmo.
+    """
     starts = generate_random_starts(maze, n_starts)
-
     simulation_results = []
 
     for idx, start in enumerate(starts):
         print(f"\n🔹 Simulación {idx + 1} | Inicio: {start}")
 
-        results = run_all_algorithms(maze, start, goals)
+        if algorithm_name:
+            results = run_algorithm(algorithm_name, maze, start, goals)
+        else:
+            results = run_all_algorithms(maze, start, goals)
 
         simulation_results.append({
             "start": start,
@@ -45,7 +51,6 @@ def summarize_simulation(simulation_results):
 
     for sim in simulation_results:
         for algo, result in sim["results"].items():
-
             if result["path"] is None:
                 continue
 
