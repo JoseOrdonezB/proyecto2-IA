@@ -65,7 +65,7 @@ def run_experiments(file_path, algorithm_name, n_simulations=10):
 
 
 def main():
-    file_path = sys.argv[1] if len(sys.argv) > 1 else "./data/test_maze.txt"
+    file_path = sys.argv[1] if len(sys.argv) > 1 else "./data/Laberinto2.txt"
 
     algorithm_name = choose_algorithm()
 
